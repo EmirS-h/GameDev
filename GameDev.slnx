@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Alaz/Alaz.csproj" />
+  <Project Path="PlatformerGame/PlatformerGame.csproj" />
+</Solution>
