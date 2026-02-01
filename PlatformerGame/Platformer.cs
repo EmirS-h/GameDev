@@ -10,7 +10,6 @@ namespace PlatformerGame
     internal class Platformer() : Game(1280, 720, 640, 360, "Platformer Game")
     {
         private Player _player;
-        private Texture2D _playerTex;
 
         private Camera2D _camera;
         Rectangle[] worldProps = new Rectangle[60];
@@ -20,17 +19,19 @@ namespace PlatformerGame
 
         protected override void LoadContent()
         {
-            _playerTex = Raylib.LoadTexture("Assets/Images/mage.png");
-            _crtShader = Raylib.LoadShader(null, "Assets/Shaders/crt.fs");
+            _crtShader = AssetManager.LoadShader("crt", "Assets/Shaders/crt.vs", "Assets/Shaders/crt.fs");
 
-            // Set One - Time Uniforms
             int texSizeLoc = Raylib.GetShaderLocation(_crtShader, "u_texture_size");
+            int abrrLoc = Raylib.GetShaderLocation(_crtShader, "u_aberration_strength");
+            int noiseLoc = Raylib.GetShaderLocation(_crtShader, "u_noise_strength");
             Raylib.SetShaderValue(_crtShader, texSizeLoc, new Vector2(GameWidth, GameHeight), ShaderUniformDataType.Vec2);
+            Raylib.SetShaderValue(_crtShader, abrrLoc, 0.2f, ShaderUniformDataType.Float);
+            Raylib.SetShaderValue(_crtShader, noiseLoc, 0.05f, ShaderUniformDataType.Float);
         }
 
         protected override void Initialize()
         {
-            _player = new Player(new Vector2(50, 50), _playerTex);
+            _player = new Player(new Vector2(50, 50));
 
             _camera = new Camera2D { Offset = new Vector2(GameWidth / 2, GameHeight / 2), Zoom = 1.0f };
 
@@ -52,6 +53,11 @@ namespace PlatformerGame
             _player.Update(dt);
             _camera.Target = Vector2.Lerp(_camera.Target, _player.Position, 0.1f);
             _camera.Offset = new Vector2(GameWidth / 2.0f, GameHeight / 2.0f) + shakeOffset;
+
+            if (Raylib.IsKeyPressed(KeyboardKey.F11))
+            {
+                Raylib.ToggleFullscreen();
+            }
         }
         protected override void Draw()
         {
@@ -86,12 +92,12 @@ namespace PlatformerGame
 
         protected override void DrawUI()
         {
+            Raylib.DrawFPS(10, 10);
         }
 
         protected override void UnloadContent()
         {
-            Raylib.UnloadTexture(_playerTex);
-            Raylib.UnloadShader(_crtShader);
+            AssetManager.UnloadAll();
         }
 
     }

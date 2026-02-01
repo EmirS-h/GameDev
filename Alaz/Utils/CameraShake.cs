@@ -19,17 +19,13 @@ namespace Alaz.Utils
             _shakeIntensity = intensity;
         }
 
-        /// <summary>
-        /// Calculates the current offset. Call this in your Main loop.
-        /// </summary>
         public static Vector2 GetOffset(float dt)
         {
             if (_shakeDuration > 0)
             {
                 _shakeDuration -= dt;
 
-                // Random offset scaled by remaining intensity
-                float currentIntensity = _shakeIntensity * (_shakeDuration / 1.0f); // Simple linear decay
+                float currentIntensity = _shakeIntensity * (_shakeDuration / 1.0f);
                 float offsetX = (float)(_rnd.NextDouble() * 2.0 - 1.0) * _shakeIntensity;
                 float offsetY = (float)(_rnd.NextDouble() * 2.0 - 1.0) * _shakeIntensity;
 

@@ -10,7 +10,7 @@ public abstract class Game
     public int GameWidth { get; private set; }
     public int GameHeight { get; private set; }
     public string Title { get; protected set; }
-
+    public int TargetFPS { get; protected set; } = 60;
     protected float Scale { get; private set; }
     protected Vector2 Offset { get; private set; }
     protected Rectangle RenderDestination { get; private set; }
@@ -29,6 +29,7 @@ public abstract class Game
     public void Run()
     {
         Raylib.SetConfigFlags(ConfigFlags.BorderlessWindowMode);
+        Raylib.SetTargetFPS(TargetFPS);
         Raylib.InitWindow(WindowWidth, WindowHeight, Title);
 
         _target = Raylib.LoadRenderTexture(GameWidth, GameHeight);
@@ -48,6 +49,8 @@ public abstract class Game
             // Render to Texture
             Raylib.BeginTextureMode(_target);
             Draw();
+            DrawUI();
+
             Raylib.EndTextureMode();
 
             // Draw Texture to Screen
@@ -56,7 +59,6 @@ public abstract class Game
 
             RenderToScreen();
 
-            DrawUI();
 
             Raylib.EndDrawing();
         }
@@ -71,10 +73,8 @@ public abstract class Game
         int screenW = Raylib.GetScreenWidth();
         int screenH = Raylib.GetScreenHeight();
 
-        // Calculate scale to fit while maintaining aspect ratio
         Scale = Math.Min((float)screenW / GameWidth, (float)screenH / GameHeight);
 
-        // Center the game in the window
         float renderW = GameWidth * Scale;
         float renderH = GameHeight * Scale;
 
@@ -82,8 +82,6 @@ public abstract class Game
         RenderDestination = new Rectangle(Offset.X, Offset.Y, renderW, renderH);
     }
 
-    // The default implementation just draws the game texture normally.
-    // "virtual" allows your game to override this behavior.
     protected virtual void RenderToScreen()
     {
         Rectangle sourceRec = new Rectangle(0, 0, _target.Texture.Width, -_target.Texture.Height);

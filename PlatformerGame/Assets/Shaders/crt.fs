@@ -11,7 +11,7 @@ uniform float u_dither_strength;
 uniform float u_color_depth;
 uniform float u_noise_strength; // 0.0 = Off, 0.05 = Subtle Static
 
-const float CURVATURE = 4.0;
+const float CURVATURE = 6.0;
 const float MASK_STRENGTH = 0.2;
 
 // Pseudo-random function for static noise

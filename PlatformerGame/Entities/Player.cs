@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Alaz.Core;
 using Alaz.Utils;
 using Raylib_cs;
 
@@ -7,7 +8,7 @@ namespace PlatformerGame.Entities
     public class Player
     {
         private const float GRAVITY = 1200.0f;
-        private const float JUMP_FORCE = -400.0f;
+        private const float JUMP_FORCE = -250.0f;
         private const float MOVE_SPEED = 250.0f;
         private const float GROUND_Y = 290.0f;
 
@@ -24,18 +25,18 @@ namespace PlatformerGame.Entities
 
         public Shader OutlineShader { get; set; }
 
-        public Player(Vector2 pos, Texture2D tex)
+        public Player(Vector2 pos)
         {
             Position = pos;
-            _tex = tex;
+            _tex = AssetManager.LoadTexture("player", "Assets/Images/miner_idle_0.png");
 
-            OutlineShader = Raylib.LoadShader(null, "Assets/Shaders/outline.fs");
+            OutlineShader = AssetManager.LoadShader("outline", null, "Assets/Shaders/outline.fs");
 
             int texSizeLoc = Raylib.GetShaderLocation(OutlineShader, "u_texture_size");
             Raylib.SetShaderValue(OutlineShader, texSizeLoc, new Vector2(_tex.Width, _tex.Height), ShaderUniformDataType.Vec2);
 
             int colorLoc = Raylib.GetShaderLocation(OutlineShader, "u_outline_color");
-            Raylib.SetShaderValue(OutlineShader, colorLoc, new Vector3(118, 84, 255), ShaderUniformDataType.Vec3);
+            Raylib.SetShaderValue(OutlineShader, colorLoc, new Vector3(1 / 255, 255 / 255, 255 / 255), ShaderUniformDataType.Vec3);
         }
 
         public void Update(float dt)
@@ -48,7 +49,7 @@ namespace PlatformerGame.Entities
             if (dir != 0)
             {
                 Velocity.X = dir * MOVE_SPEED;
-                _tAngle = (dir > 0) ? 180 : 0;
+                _tAngle = (dir > 0) ? 0 : 180;
                 _walkTime += dt * 14.0f;
             }
             else
@@ -68,7 +69,7 @@ namespace PlatformerGame.Entities
                 if (!_isGrounded && Velocity.Y > 100)
                 {
                     _vScale = 0.7f;
-                    CameraShake.Shake(0.2f, 2.0f);
+                    CameraShake.Shake(0.25f, 2.0f);
                 }
                 _isGrounded = true;
                 Velocity.Y = 0;
@@ -112,18 +113,9 @@ namespace PlatformerGame.Entities
             float dW = _tex.Width * Scale * (2.0f - _vScale + _walkBob) * flip;
             float dH = _tex.Height * Scale * (_vScale - _walkBob);
 
-            if (OutlineShader.Id != 0)
-            {
-                Raylib.BeginShaderMode(OutlineShader);
-            }
-
             Raylib.DrawTexturePro(_tex, new Rectangle(0, 0, sW, _tex.Height),
                 new Rectangle(Position.X, Position.Y, dW, dH), new Vector2(dW / 2, dH), _vTilt, Color.White);
 
-            if (OutlineShader.Id != 0)
-            {
-                Raylib.EndShaderMode();
-            }
         }
 
         private float Lerp(float a, float b, float t) => a + (b - a) * t;
